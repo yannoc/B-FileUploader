@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*" />
+	<title>Document</title>
+	<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/bootstrap-table.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/mystyle.css">
+	
+	<script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>       
+    <script src="../js/bootstrap-table.js"></script>
+    <script type="text/javascript" src="../js/webuploader-html5.js"></script>
+
+	<script type="text/javascript" src="../js/cstd-fileuploader.js"></script>
+</head>
+<body>
+	<div id = "cstd-uploader" style="margin:100px auto; padding: 100px;"></div>
+</body>
+<script type="text/javascript">
+	$(function(){
+		var options = {
+			// 文件服务器地址：协议+IP+端口，如http://192.168.0.100：8080， 不可为空
+			server:	'http://localhost:8081/',	
+			// 加载上传插件的容器selector，不可为空
+			picker: '#cstd-uploader',	
+			// 是否显示上传文件按钮，如果不显示则只读取附件，默认显示	
+			showUploadBtn: true,
+			// 参数，有dbName对应newtera的schema，className 对应newtera的classname， oid对应newtera的oid
+			params:{
+				dbName: 'Demo',
+				className: 'test',
+				oid: '123456'
+			}
+		}
+		var uploader = CSTDuploader.create(options)
+	})
+</script>
+</html>

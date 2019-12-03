@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    
+</head>
+<body style="padding: 20px; margin: 0">
+    <div id="CSTDfileContainer" style="display: none;">
+        
+    </div>
+    <input type="file" id="CSTDfileInput" multiple="multiple" style="display: none;">
+    <button id="upload" style="display: none;">上传</button>
+    <span id="initSocket" style="width: 100px; margin: auto; display: block; padding: 3px 8px; background-color: #ccc; text-align: center;">初始化</span>
+    <div id="list2"></div>
+
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> 
+ <!--    <script src="js/js.js"></script>    
+    <script src="js/upload-server.js"></script> -->
+    <script src="../js/cstd-websocket.js"></script>
+    <script src="../js/utils.js"></script>
+
+    <script>
+      
+ /*拖拽的目标对象------ document 监听drop 并防止浏览器打开客户端的图片*/
+    document.ondragover = function (e) {
+        e.preventDefault();  //只有在ondragover中阻止默认行为才能触发 ondrop 而不是 ondragleave
+    };
+    document.ondrop = function (e) {
+        e.preventDefault();  //阻止 document.ondrop的默认行为  *** 在新窗口中打开拖进的图片
+    };
+
+    
+    $(function(){
+
+        // var fileServer = new WebServer();
+        // fileServer.run();
+        // var fileList = [];
+        // $("#upload").on('click', function(){
+        //     console.info("上传");
+        //     var option = {
+        //         el: CSTDfileContainer,
+        //         data: fileList,
+        //         params: {
+        //             oid: '123',
+        //             user: 'admin'
+        //         }
+        // }
+            // var uploader = new CSTDuploader(option)
+            // uploader.uploadQueue(123);
+        // })
+
+        //点击导入按钮,使files触发点击事件,然后完成读取文件的操作
+        CSTDfileInput.onchange = function(e){
+            var files = this.files;
+            fileList.push(files);
+            var html = [];
+            for(var i = 0, len = files.length; i < len; i++) {
+                var f = files[i];
+                html.push(
+                    '<p>',
+                        f.name + '(' + (f.type || "n/a") + ')' + ' - ' + f.size + 'bytes',
+                    '</p>'
+                );
+            }
+            document.getElementById('list2').innerHTML = html.join('');
+        }
+
+           
+        CSTDfileContainer.ondrop = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var files = e.dataTransfer.files;
+            var html = [];
+            for(var i = 0, len = files.length; i < len; i++) {
+                var f = files[i];
+                html.push(
+                    '<p>',
+                        f.name + '(' + (f.type || "n/a") + ')' + ' - ' + f.size + 'bytes',
+                    '</p>'
+                );
+            }
+            document.getElementById('list2').innerHTML = html.join('');
+        }
+        CSTDfileContainer.ondragover = function(e) {  
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dragEffect = 'copy';
+        }
+    })
+    
+    </script>
+
+<script type="text/javascript">
+    // var socket;
+    // if(typeof(WebSocket) == "undefined") {
+    //     console.log("您的浏览器不支持WebSocket");
+    // }else{
+    //     console.log("您的浏览器支持WebSocket");
+        
+    //     //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
+    //     //socket = new WebSocket("ws://localhost:9094/starManager/websocket/张三")
+    //     socket = new WebSocket("ws://localhost:8081/app/fileServer/"+1);
+    //     //打开事件
+    //     socket.onopen = function() {
+    //         console.log("Socket 已打开");
+    //         //socket.send("这是来自客户端的消息" + location.href + new Date());
+    //     };
+    //     //获得消息事件
+    //     socket.onmessage = function(msg) {
+    //         console.log(msg.data);
+    //         //发现消息进入    调后台获取
+    //         //getCallingList();
+    //     };
+    //     //关闭事件
+    //     socket.onclose = function() {
+    //         console.log("Socket已关闭");
+    //     };
+    //     //发生了错误事件
+    //     socket.onerror = function() {
+    //         alert("Socket发生了错误");
+    //     }
+    //     $(window).unload(function(){
+    //       socket.close();
+    //     });
+
+
+    // }
+
+
+    $(function(){
+        $("#initSocket").on('click', function(){
+            alert(123);
+            var server3 = new FileServer({
+                message:"我是客户端 3"
+            })
+        })
+        // server3.onerror = function(){
+        //     console.info("上传失败！")
+        // }
+        // var server2 = new FileServer()  
+    })
+
+</script>
+
+</body>
+</html>
