@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @program: fileweb
@@ -18,7 +19,7 @@ import java.util.List;
 public interface AttachmentRepository extends JpaRepository<Attachment, String> {
 
     @Override
-    Attachment getOne(String id);
+    Optional<Attachment> findById(String s);
 
     @Query("select u from Attachment u where u.dbName = :dbName and u.className = :className and u.oid= :oid")
     List<Attachment> findByParams(@Param("dbName") String dbName,
@@ -29,4 +30,5 @@ public interface AttachmentRepository extends JpaRepository<Attachment, String> 
 
     @Override
     void deleteById(String s);
+
 }

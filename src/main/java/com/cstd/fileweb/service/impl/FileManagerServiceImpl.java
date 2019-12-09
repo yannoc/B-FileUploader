@@ -8,18 +8,16 @@ import com.cstd.fileweb.utils.FileUtil;
 import com.cstd.fileweb.utils.KeyUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Attr;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @program: fileweb
@@ -31,21 +29,26 @@ import java.util.Date;
 @Service
 public class FileManagerServiceImpl implements FileMangerService {
 
-    private static final String PATH = "E:/CSTD/TDM/data";
+    @Value("${file.uploadFolder}")
+    private String PATH;
 
-    private static final String PROPS_PATH = "E:/CSTD/TDM/properties";
-
-    private static final String TEMP_PATH = "E:/CSTD/TDM/temp";
+    @Value("${file.uploadTempFolder}")
+    private String TEMP_PATH;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Autowired
     private AttachmentRepository attaRepository;
 
+    public Map<String, Object> getFile() {
+        System.out.println("213");
+        return null;
+    }
+
+
     @Override
     public Map<String, Object> findByFileMd5(String md5) {
         Attachment uploadFile = null;
-
         Map<String, Object> map = null;
         if (uploadFile == null) {
             //没有上传过文件
@@ -233,46 +236,52 @@ public class FileManagerServiceImpl implements FileMangerService {
 
     public Map<String, Object> downloadFile(HttpServletResponse response, String guid) throws Exception {
         Map<String,Object> result = new HashMap<>();
-        Attachment attr = attaRepository.getOne(guid);
-        if(null == attr){
+        Optional<Attachment> attrOptional = attaRepository.findById(guid);
+        if (attrOptional.isPresent()){
+            Attachment attr = attrOptional.get();
+            File file = new File(attr.getFilePath());   //下载目录加文件名拼接成realpath
+            if(!file.exists()){
+                result.put("success", false);
+                result.put("msg","服务器上找不到文件！");
+                return result;
+            }
+
+            String downloadFileName = attr.getFileName();
+            String tempStr =  UUID.randomUUID().toString();
+            String tempFileName = downloadFileName.replaceAll(" ", tempStr);
+            tempFileName = URLEncoder.encode(tempFileName, "utf-8");
+            downloadFileName = tempFileName.replaceAll(tempStr, " ");
+            String name ="attachment;fileName=\"" + downloadFileName + "\"; filename*=\"utf-8''" + downloadFileName+"\""+";filename*=utf-8''"+downloadFileName;
+            // 设置强制下载不打开
+            response.setContentType("application/force-download");
+            response.setHeader("Content-Disposition", "attachment;fileName="+name);
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null; //文件输入流
+            BufferedInputStream bis = null;
+            OutputStream os = null; //输出流
+            try{
+                os = response.getOutputStream();
+                fis = new FileInputStream(file);
+                bis = new BufferedInputStream(fis);
+                int i = bis.read(buffer);
+                while(i != -1){
+                    os.write(buffer);
+                    i = bis.read(buffer);
+                }
+            } finally {
+                bis.close();
+                fis.close();
+            }
+        }
+        else{
             result.put("success", false);
             result.put("msg","没有该附件信息！");
             return result;
-        }
-        File file = new File(attr.getFilePath());//下载目录加文件名拼接成realpath
-        if(!file.exists()){
-            result.put("success", false);
-            result.put("msg","服务器上找不到文件！");
-            return result;
-        }
-        response.setHeader("Content-Disposition", "attachment;fileName=" + attr.getFileName());
-        byte[] buffer = new byte[1024];
-        FileInputStream fis = null; //文件输入流
-        BufferedInputStream bis = null;
-        OutputStream os = null; //输出流
-        try {
-            os = response.getOutputStream();
-            fis = new FileInputStream(file);
-            bis = new BufferedInputStream(fis);
-            int i = bis.read(buffer);
-            while(i != -1){
-                os.write(buffer);
-                i = bis.read(buffer);
-            }
-        }finally {
-            bis.close();
-            fis.close();
         }
         result.put("success", true);
         result.put("msg","文件下载成功！");
         return result;
     }
-
-    public Map<String, Object> getFile() {
-
-        return null;
-    }
-
     /**
      * 合并文件
      * @throws Exception

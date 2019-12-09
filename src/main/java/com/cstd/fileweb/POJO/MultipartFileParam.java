@@ -18,6 +18,16 @@ public class MultipartFileParam {
 
     private String name;    // 分块名
 
+    private String chunk;   // 分块下标记
+
+    private String chunks;  // 所有分块数
+
+    private String fileName; // 上传的文件的名称
+
+    private String ext; //文件扩展名，通过文件名获取，例如test.png的扩展名为png
+
+    private String statusText;  // 状态文字说明。在不同的status语境下有不同的用途
+
     public void setGuid(String guid) {
         this.guid = guid;
     }
@@ -82,16 +92,6 @@ public class MultipartFileParam {
     public String getStatusText() {
         return statusText;
     }
-
-    private String chunk;   // 分块下标记
-
-    private String chunks;  // 所有分块数
-
-    private String fileName; // 上传的文件的名称
-
-    private String ext; //文件扩展名，通过文件名获取，例如test.png的扩展名为png
-
-    private String statusText;  // 状态文字说明。在不同的status语境下有不同的用途
 
     public String getName() {
         return name;

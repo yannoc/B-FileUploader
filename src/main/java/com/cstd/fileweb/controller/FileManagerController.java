@@ -6,16 +6,12 @@ import com.cstd.fileweb.service.FileMangerService;
 import com.cstd.fileweb.utils.JsonUtil;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,18 +30,13 @@ public class FileManagerController {
     @Autowired
     private FileMangerService fileService;
 
-//    @Value("${upload-path}")
-//    private String uploadPath;
-//
-//    @Value("${upload-temp-path}")
-//    private String decryptFilePathTemp;
-
 //    @PostMapping("/isUpload")
 //    public Map<String, Object> isUpload(@Valid MultipartFileParam form) {
 //
 //        return fileService.findByFileMd5(form.getId());
 //
 //    }
+
     @PostMapping("/save")
     public String saveFileInfo(@Valid Attachment param){
         Map<String, Object> map;
@@ -64,7 +55,7 @@ public class FileManagerController {
 
 
     @PostMapping("/upload")
-    public String upload(HttpServletRequest request, @Valid MultipartFileParam params, @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile multipartFile) {
+    public String upload(HttpServletRequest request, @Valid MultipartFileParam params, @RequestParam(value = "file", required = false) MultipartFile multipartFile) {
         Map<String, Object> map;
         try {
             boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -103,10 +94,15 @@ public class FileManagerController {
         //String result = fileService.getFile();
         return "";
     }
+
     @RequestMapping("/getFiles")
-    public String getFilesList(@RequestParam(value = "dbName", required = false)String dbName, @RequestParam(value = "className", required = false)String className, @RequestParam(value = "oid")String oid){
+    public String getFilesList(@RequestBody String params){
         Map<String, Object> map;
         try {
+            Map param = JsonUtil.fromJson(params,Map.class);
+            String dbName = (String) param.get("dbName");
+            String className = (String) param.get("className");
+            String oid = (String) param.get("oid");
             map = fileService.getFileList(dbName, className, oid);
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,6 +124,17 @@ public class FileManagerController {
             map.put("msg","删除数据失败！");
         }
         return JsonUtil.toJson(map);
+    }
+
+
+    @RequestMapping("/test")
+    public String getFile(@Valid Attachment param){
+        try {
+            fileService.getFile();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }
