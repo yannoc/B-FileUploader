@@ -80,6 +80,23 @@
                     var _id = opts.id
                     var _self = this;
                     var _server = opts.server;
+                    WebUploader.Uploader.register({
+                        //
+                        "before-send-file":"beforeSendFile",	//整个文件上传前
+
+                        "before-send":"beforeSend",  	//每个分片上传前
+                        "after-send-file":"afterSendFile",  //所有分片上传完毕
+                    },{
+                        beforeSendFile: function(){
+
+                        },
+                        beforeSend:function	(){
+
+                        },
+                        afterSendFile: function(){
+
+                        }
+                    })
                     var uploader = WebUploader.create({
                         //swf: '/cloud/js/webuploader-0.1.5/Uploader.swf',	// swf文件路径
                         server: _server + '/app/main/upload',	// 文件接收服务端。
@@ -96,7 +113,6 @@
                         resize: false	// 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
                     })
 
-                    //当有文件被添加进队列之后
                     uploader.on('fileQueued', function (file) {
                         // 在附件列表的行内添加一组数据
                         var guid = WebUploader.Base.guid();
