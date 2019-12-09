@@ -23,7 +23,7 @@
 		CSTDuploader.prototype = {
 			constructor: this,    //构造器指向构造函数 ,防止构造器指向Object的情况；
 			init: function(opts){		
-				this.initUI(opts)		
+				this.initUI(opts);
 				this.initUploader(opts)
 				this.initEvent(opts);
 			},
@@ -53,7 +53,8 @@
 				var uploader = WebUploader.create({			    
 				    //swf: '/cloud/js/webuploader-0.1.5/Uploader.swf',	// swf文件路径			    
 				    server: _server + '/app/main/upload',	// 文件接收服务端。
-				    // 选择文件的按钮。可选。
+                    dnd: '',
+					// 选择文件的按钮。可选。
 				    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
 				    pick: '#selectPicker',
 				   	chunked : true, 	// 分片处理
@@ -66,8 +67,24 @@
 				    resize: false	// 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
 				})
 
-				//当有文件被添加进队列之后
-				uploader.on('fileQueued', function (file) {					
+                WebUploader.Uploader.register({
+					//
+					"before-send-file":"beforeSendFile",	//整个文件上传前
+
+					"before-send":"beforeSend",  	//每个分片上传前
+					"after-send-file":"afterSendFile",  //所有分片上传完毕
+				},{
+                    beforeSendFile: function(){
+
+				},
+                    beforeSend:function	(){
+
+					},
+                    afterSendFile: function(){
+
+					}
+				})
+                    uploader.on('fileQueued', function (file) {
 					// 在附件列表的行内添加一组数据					
 					var guid = WebUploader.Base.guid();	
 					file.guid = guid;							
@@ -82,6 +99,8 @@
 					_self.btnDisabledRule('waiting');
 				});
 				// 当开始上传流程时
+
+
 				uploader.on('startUpload',function(a,b,c){
 					_self.btnDisabledRule('uploading');
 				})
@@ -107,7 +126,7 @@
 						     	'<span>0%</span>'
 					}
 					$("#uploadTable").bootstrapTable('updateCellByUniqueId', data);				
-				    uploader.options.formData.guid = file.guid;					   			  
+				    uploader.options.formData.guid = file.guid;
 				});			 			
 								 
 				//文件上传过程中创建进度条实时显示。
