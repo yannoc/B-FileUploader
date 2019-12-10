@@ -502,34 +502,32 @@
                             { field: 'action', align: 'right', title: '',  width: 80,
                                 events: window.operatEvents = {
                                     'click .btn': function(e,value,row,index){
-                                        var guid = row.guid;
                                         // 上传失败重试当前文件
                                         if(e.target.id==='repeatUploadBtn'+_id+''){
                                             me.uploader.retry(row.fileId);
                                         }
-                                        return;
                                     }
                                 },
                             }
                         ]
-                    }
+                    };
                     $('#uploadTable'+_id+'').bootstrapTable(tableOpts);
                 },
-            }
+            };
             CSTDuploader.create = function(opts){
                 return new CSTDuploader(opts);
-            }
+            };
             return CSTDuploader;
         }();
     return CSTDuploader
-});(function(global){
-    "use strict"
-    var _global;
+});(function(){
+    "use strict";
+    let _global;
 
-    var util = {
+    let util = {
         // 对象合并
         extend: function (o,n,override) {
-            for(var key in n){
+            for(let key in n){
                 if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
                     o[key]=n[key];
                 }
@@ -539,7 +537,7 @@
         getGUID: function(randomLength){
             return Number(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
         }
-    }
+    };
     _global = (function(){ return this || (0, eval)('this'); }());
     !('util' in _global) && (_global.util = util);
-}())
+}());
