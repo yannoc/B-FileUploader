@@ -80,15 +80,18 @@
                     var _id = opts.id
                     var _self = this;
                     var _server = opts.server;
+                    var uploader = null;
                     WebUploader.Uploader.register({
-                        //
                         "before-send-file":"beforeSendFile",	//整个文件上传前
-
                         "before-send":"beforeSend",  	//每个分片上传前
                         "after-send-file":"afterSendFile",  //所有分片上传完毕
                     },{
-                        beforeSendFile: function(){
-
+                        beforeSendFile: function(file){
+                            let owner = this.owner;
+                            debugger;
+                            owner.md5File(file.source, block.start, block.end).then(function(ret) {
+                                console.log(ret)
+                            });
                         },
                         beforeSend:function	(){
 
@@ -97,7 +100,7 @@
 
                         }
                     })
-                    var uploader = WebUploader.create({
+                    uploader = WebUploader.create({
                         //swf: '/cloud/js/webuploader-0.1.5/Uploader.swf',	// swf文件路径
                         server: _server + '/app/main/upload',	// 文件接收服务端。
                         // 选择文件的按钮。可选。
@@ -114,18 +117,28 @@
                     })
 
                     uploader.on('fileQueued', function (file) {
+                        var startTime = Date.now();
+                        uploader.md5File(file, 0, file.size)// 及时显示进度
+                            .progress(function(percentage) {
+                                console.log('Percentage:', percentage);
+                            })                            // 完成
+                            .then(function(val) {
+                                console.log('md5 result:', val);
+                                console.info()
+                            });
+
                         // 在附件列表的行内添加一组数据
-                        var guid = WebUploader.Base.guid();
-                        file.guid = guid;
-                        var data = {
-                            fileId: file.id,
-                            fileName: file.name,
-                            fileExt: file.ext,
-                            fileSize: file.size,
-                            process:'<i class="text-primary"><small>等待上传</small></i>',
-                        }
-                        $('#uploadTable'+_id+'').bootstrapTable('append', data);
-                        _self.btnDisabledRule(_id, 'waiting');
+                        // var guid = WebUploader.Base.guid();
+                        // file.guid = guid;
+                        // var data = {
+                        //     fileId: file.id,
+                        //     fileName: file.name,
+                        //     fileExt: file.ext,
+                        //     fileSize: file.size,
+                        //     process:'<i class="text-primary"><small>等待上传</small></i>',
+                        // }
+                        // $('#uploadTable'+_id+'').bootstrapTable('append', data);
+                        // _self.btnDisabledRule(_id, 'waiting');
                     });
                     // 当开始上传流程时
                     uploader.on('startUpload',function(a,b,c){
